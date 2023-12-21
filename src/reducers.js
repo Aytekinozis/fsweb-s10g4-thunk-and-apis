@@ -9,9 +9,12 @@ import {
 
 const initial = {
   favs: [],
-  current: null,
+  current: {
+    fact: "A cat called Dusty has the known record for the most kittens. She had more than 420 kittens in her lifetime.",
+    length: 108,
+  },
   error: null,
-  loading: true,
+  loading: false,
 };
 
 function writeFavsToLocalStorage(state) {
@@ -25,22 +28,29 @@ function readFavsFromLocalStorage() {
 export function myReducer(state = initial, action) {
   switch (action.type) {
     case FAV_ADD:
-      return state;
+      const favState = { ...state, favs: [...state.favs, action.payload] };
+      writeFavsToLocalStorage(favState);
+      return favState;
 
     case FAV_REMOVE:
-      return state;
+      const favRemState = {
+        ...state,
+        favs: state.favs.filter((item) => item.id !== action.payload),
+      };
+      writeFavsToLocalStorage(favRemState);
+      return favRemState;
 
     case FETCH_SUCCESS:
-      return state;
+      return { ...state, current: action.payload, loading: false, error: null };
 
     case FETCH_LOADING:
-      return state;
+      return { ...state, loading: true, error: null, current: null };
 
     case FETCH_ERROR:
-      return state;
+      return { ...state, error: action.payload, loading: false };
 
     case GET_FAVS_FROM_LS:
-      return state;
+      return { ...state, favs: readFavsFromLocalStorage() || [] };
 
     default:
       return state;
